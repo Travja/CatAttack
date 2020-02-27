@@ -1,0 +1,5 @@
+main: me.travja.catattack.Main
+description: Makes cats behave like wolves
+author: Travja
+version: 1.0
+name: CatAttack
