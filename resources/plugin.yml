@@ -3,3 +3,4 @@ description: Makes cats behave like wolves
 author: Travja
 version: 1.0
 name: CatAttack
+load: startup
