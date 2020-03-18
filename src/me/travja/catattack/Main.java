@@ -3,6 +3,13 @@ package me.travja.catattack;
 import net.minecraft.server.v1_8_R3.EntityInsentient;
 import net.minecraft.server.v1_8_R3.EntityOcelot;
 import net.minecraft.server.v1_8_R3.EntityTypes;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Ocelot;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
@@ -11,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Main extends JavaPlugin {
+public class Main extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         registerEntity("Ocelot", 98, EntityOcelot.class, CustomCat.class);
@@ -40,5 +47,30 @@ public class Main extends JavaPlugin {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @EventHandler
+    public void spawn(CreatureSpawnEvent event) {
+        Entity ent = event.getEntity();
+        if(ent.getType() != EntityType.OCELOT)
+            return;
+
+        if(event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG) {
+            double closeDist = 20d;
+            Player nearest = null;
+            for (Entity near : ent.getNearbyEntities(5, 5, 5)) {
+                if((nearest == null || closeDist > ent.getLocation().distance(near.getLocation())) && near instanceof Player) {
+                    nearest = (Player) near;
+                    closeDist = ent.getLocation().distance(near.getLocation());
+                }
+            }
+
+            if(nearest != null) {
+                Ocelot cat = (Ocelot) ent;
+                cat.setTamed(true);
+                cat.setOwner(nearest);
+            }
+        }
+
     }
 }
