@@ -3,6 +3,7 @@ package me.travja.catattack;
 import net.minecraft.server.v1_8_R3.EntityInsentient;
 import net.minecraft.server.v1_8_R3.EntityOcelot;
 import net.minecraft.server.v1_8_R3.EntityTypes;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Ocelot;
@@ -12,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -19,8 +21,20 @@ import java.util.List;
 import java.util.Map;
 
 public class Main extends JavaPlugin implements Listener {
+
+    private FileConfiguration config;
+    private boolean autoTame = true;
+
     @Override
     public void onEnable() {
+        config = getConfig();
+        if(!new File(getDataFolder(), "config.yml").exists()) {
+            saveDefaultConfig();
+            config.options().copyDefaults(true);
+        }
+
+        autoTame = config.getBoolean("auto_tame");
+
         registerEntity("Ocelot", 98, EntityOcelot.class, CustomCat.class);
     }
 
@@ -51,6 +65,9 @@ public class Main extends JavaPlugin implements Listener {
 
     @EventHandler
     public void spawn(CreatureSpawnEvent event) {
+        if(!autoTame)
+            return;
+
         Entity ent = event.getEntity();
         if(ent.getType() != EntityType.OCELOT)
             return;
